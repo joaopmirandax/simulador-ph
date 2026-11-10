@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escala de pH</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Karla:wght@400;700&display=swap">
+<style>
+:root{--papel:#f3ead7;--tinta:#1a1a2e;--rosa:#ff4f87;--azul:#2d4bd6;--sol:#ffc933}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--papel);color:var(--tinta);font-family:"Karla",system-ui,sans-serif;font-size:17px;min-height:100vh;padding:28px 18px 40px;display:flex;justify-content:center}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;opacity:.3;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .25  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+main{width:100%;max-width:1080px}
+header{display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-family:"Bowlby One",Impact,sans-serif;font-weight:400;font-size:clamp(3.6rem,10vw,6.4rem);line-height:.9;margin:0;color:var(--rosa);text-shadow:5px 4px 0 var(--azul);transform:rotate(-2deg)}
+header p{margin:0 0 6px;max-width:34ch;font-weight:700;line-height:1.3}
+.lamina{position:relative;background:#fbf6ea;border:4px solid var(--tinta);border-radius:6px 34px 6px 6px;box-shadow:10px 10px 0 var(--azul);padding:6px}
+svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
+svg text{font-family:"Karla",system-ui,sans-serif;font-weight:700;fill:var(--tinta)}
+svg [tabindex]:focus-visible{outline:4px solid var(--azul);outline-offset:4px}
+svg [tabindex]{cursor:grab}
+.sel{position:absolute;left:57%;top:2.2%;transform:translateX(-50%);z-index:3;width:220px}
+.sel>button{width:100%;display:flex;align-items:center;gap:10px;font:inherit;font-weight:700;color:var(--tinta);background:var(--papel);border:3px solid var(--tinta);border-radius:4px 16px 4px 4px;padding:7px 12px;box-shadow:4px 4px 0 var(--tinta);cursor:pointer;text-align:left}
+.sel>button span{flex:1}
+.sw{display:inline-block;width:20px;height:20px;border:2px solid var(--tinta);border-radius:3px;flex:none}
+ul{position:absolute;top:100%;left:0;right:0;margin:6px 0 0;padding:6px;list-style:none;background:var(--papel);border:3px solid var(--tinta);border-radius:4px 16px 4px 4px;box-shadow:6px 6px 0 var(--rosa);max-height:360px;overflow:auto}
+li{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:6px;cursor:pointer;font-weight:700}
+li:hover,li:focus-visible{background:var(--sol);outline:none}
+li[aria-selected=true]{text-decoration:underline wavy var(--rosa)}
+.barra{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:flex-end;margin-top:26px}
+.bt{display:inline-flex;align-items:center;gap:10px;font:inherit;font-weight:700;color:var(--tinta);cursor:pointer;background:#fbf6ea;border:3px solid var(--tinta);border-radius:999px 14px 999px 14px;padding:10px 20px 10px 14px;box-shadow:4px 4px 0 var(--tinta)}
+.bt:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--tinta)}
+.bt:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--tinta)}
+.bt svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bt.reiniciar{background:var(--rosa);border-radius:50%;width:104px;height:104px;flex-direction:column;justify-content:center;gap:2px;padding:0;transform:rotate(-6deg);box-shadow:5px 5px 0 var(--azul)}
+.bt.reiniciar svg{width:34px;height:34px}
+.bt.reiniciar:hover{transform:rotate(-6deg) translate(-1px,-1px)}
+.bt:focus-visible,.sel>button:focus-visible{outline:4px solid var(--azul)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+dialog{border:3px solid var(--tinta);border-radius:4px 22px 4px 4px;background:#fff3b8;color:var(--tinta);max-width:470px;width:calc(100% - 32px);padding:24px;box-shadow:8px 8px 0 var(--rosa)}
+dialog::backdrop{background:rgba(26,26,46,.55)}
+dialog h2{font-family:"Bowlby One",Impact,sans-serif;font-weight:400;font-size:1.6rem;margin:0 0 14px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0 0 18px}
+dt{font-weight:700;white-space:nowrap}dd{margin:0}
+kbd{background:#fbf6ea;border:2px solid var(--tinta);border-bottom-width:4px;border-radius:5px;padding:0 7px;font:inherit;font-weight:700}
+@media(max-width:700px){.sel{width:170px;top:1%}.lamina{box-shadow:6px 6px 0 var(--azul)}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>pH</h1>
+  <p>Misture líquidos do dia a dia e descubra se são ácidos, básicos ou neutros.</p>
+</header>
+
+<div class="lamina">
+  <div class="sel">
+    <button id="selBtn" aria-haspopup="listbox" aria-expanded="false"><i class="sw" id="selSw"></i><span id="selTxt">água</span><b aria-hidden="true">▼</b></button>
+    <ul id="list" role="listbox" aria-label="Líquido do conta-gotas" hidden></ul>
+  </div>
+  <svg id="cena" viewBox="0 0 1000 640" role="group" aria-label="Simulação da escala de pH"></svg>
+  <p class="sr" id="sr" aria-live="polite"></p>
+</div>
+
+<div class="barra">
+  <button class="bt" id="snd" aria-pressed="true" title="Som (M)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path id="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="sndTxt">Som ligado</span>
+  </button>
+  <button class="bt" id="kb" title="Atalhos (?)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>Atalhos</span>
+  </button>
+  <button class="bt reiniciar" id="reset" title="Reiniciar (R)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg><span>Reiniciar</span>
+  </button>
+</div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dt">
+  <h2 id="dt">Atalhos de teclado</h2>
+  <dl>
+    <dt><kbd>Tab</kbd></dt><dd>Passa pelo menu, conta-gotas, torneira, ralo e sonda</dd>
+    <dt><kbd>Espaço</kbd></dt><dd>No conta-gotas: segure para pingar</dd>
+    <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Na torneira ou no ralo: abre e fecha</dd>
+    <dt><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Na sonda: move</dd>
+    <dt><kbd>Shift</kbd> + setas</dt><dd>Passos maiores na sonda</dd>
+    <dt><kbd>M</kbd></dt><dd>Liga ou desliga o som</dd>
+    <dt><kbd>R</kbd></dt><dd>Reinicia tudo</dd>
+    <dt><kbd>?</kbd></dt><dd>Abre esta folha</dd>
+  </dl>
+  <button class="bt" id="dclose" style="border-radius:14px;padding:8px 20px">Fechar</button>
+</dialog>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), svg=$('#cena');
+const PAPEL='#fbf6ea',TINTA='#1a1a2e',ROSA='#ff4f87',AZUL='#2d4bd6',SOL='#ffc933';
+const LIQ=[['ácido de bateria',1,'#f4e72a'],['sangue',7.4,'#c44a4a'],['canja de galinha',5.8,'#fbea7a'],['café',5,'#8a5a1c'],
+ ['desentupidor de ralos',13,'#fff04a'],['sabonete',10,'#d98ae6'],['leite',6.5,'#f6f2ea'],['suco de laranja',3.5,'#ffb81f'],
+ ['refrigerante',2.5,'#c4f26a'],['cuspe',7.4,'#cdeee8'],['vômito',2,'#f6a97a'],['água',7,'#cdf5f6']];
+const AGUA=LIQ[11];
+const BX1=390,BX2=770,BY1=215,BY2=510,CAP=1.25,PPL=(BY2-BY1)/CAP;
+const yPH=p=>480-p*400/14;
+const rgb=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const hex=c=>'#'+c.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+
+/* ---------- cena (SVG) ---------- */
+let m=`<defs>
+<pattern id="hat" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="rgba(26,26,46,.16)" stroke-width="3"/></pattern>
+<linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a63e0"/><stop offset=".644" stop-color="${PAPEL}"/><stop offset="1" stop-color="${ROSA}"/></linearGradient>
+<clipPath id="cl"><rect x="${BX1}" y="${BY1}" width="${BX2-BX1}" height="${BY2-BY1}"/></clipPath></defs>`;
+// escala
+m+=`<path id="cable" fill="none" stroke="${TINTA}" stroke-width="6" stroke-linecap="round"/>
+<rect x="74" y="76" width="44" height="416" fill="${TINTA}"/>
+<rect x="70" y="72" width="44" height="416" fill="url(#gr)" stroke="${TINTA}" stroke-width="4"/>`;
+for(let p=0;p<=14;p++){const y=yPH(p),ev=p%2===0;
+  if(p===7)m+=`<line x1="40" x2="70" y1="${y}" y2="${y}" stroke="${TINTA}" stroke-width="5"/><text x="32" y="${y+9}" text-anchor="end" font-size="28">7</text>`;
+  else m+=`<line x1="${ev?52:61}" x2="70" y1="${y}" y2="${y}" stroke="${TINTA}" stroke-width="3"/>`+(ev?`<text x="44" y="${y+6}" text-anchor="end" font-size="18">${p}</text>`:'');}
+m+=`<text transform="translate(100,170) rotate(-90)" text-anchor="middle" font-size="22">básico</text>
+<text transform="translate(100,410) rotate(-90)" text-anchor="middle" font-size="22">ácido</text>`;
+// béquer
+m+=`<g clip-path="url(#cl)"><rect id="liq" x="${BX1}" width="${BX2-BX1}" y="${BY2}" height="0" fill="#cdf5f6"/><rect id="liqH" x="${BX1}" width="${BX2-BX1}" y="${BY2}" height="0" fill="url(#hat)"/><line id="surf" x1="${BX1}" x2="${BX2}" stroke="${TINTA}" stroke-width="3"/></g>
+<path d="M${BX1-16} ${BY1-16}L${BX1} ${BY1}V${BY2}H${BX2}V${BY1}L${BX2+16} ${BY1-16}" fill="none" stroke="${TINTA}" stroke-width="5" stroke-linejoin="round"/>`;
+for(let i=1;i<=10;i++){const y=BY2-i*.125*PPL,big=i===4||i===8,len=big?28:13;
+  m+=`<line x1="${BX1}" x2="${BX1+len}" y1="${y}" y2="${y}" stroke="${TINTA}" stroke-width="3"/><line x1="${BX2-len}" x2="${BX2}" y1="${y}" y2="${y}" stroke="${TINTA}" stroke-width="3"/>`;
+  if(big)m+=`<text x="${BX2-36}" y="${y+7}" text-anchor="end" font-size="20">${i===4?'½ L':'1 L'}</text>`;}
+m+=`<g id="lab" visibility="hidden"><rect x="-62" y="-19" width="124" height="38" rx="8" fill="${PAPEL}" opacity=".88"/><text id="labT" text-anchor="middle" y="8" font-size="24">neutro</text></g>
+<g id="mark"><polygon points="${BX2+10},0 ${BX2+26},-9 ${BX2+26},9" fill="${TINTA}"/><text id="markT" x="${BX2+32}" y="7" font-size="21">0.00 L</text></g>`;
+// fluxos
+m+=`<rect id="sD" x="567" y="188" width="6" height="0" fill="#cdf5f6" stroke="${TINTA}" stroke-width="1.5"/>
+<rect id="sW" x="752" y="178" width="12" height="0" fill="${AGUA[2]}" stroke="${TINTA}" stroke-width="1.5"/>
+<rect id="sR" x="311" y="530" width="10" height="0" fill="#cdf5f6" stroke="${TINTA}" stroke-width="1.5"/>`;
+// torneira de água
+m+=`<g stroke="${TINTA}" stroke-width="4" stroke-linejoin="round"><path d="M1000 112H778V112H738V176H778V150H1000" fill="#d8d2c2"/><path d="M778 124H1000" stroke="#fff" stroke-width="5" opacity=".6"/><rect x="740" y="164" width="36" height="14" fill="#b9b19c"/><rect x="748" y="94" width="20" height="20" fill="#b9b19c"/></g>
+<text x="850" y="96" font-size="26">água</text>
+<g id="gF" tabindex="0" role="slider" aria-label="Torneira de água" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><line id="aF" x1="758" y1="104" stroke="${TINTA}" stroke-width="7" stroke-linecap="round"/><circle id="bF" r="14" fill="${AZUL}" stroke="${TINTA}" stroke-width="4"/></g>`;
+// ralo
+m+=`<g stroke="${TINTA}" stroke-width="4" stroke-linejoin="round"><path d="M392 472H334V472H296V532H334V504H392Z" fill="#d8d2c2"/><rect x="298" y="520" width="34" height="14" fill="#b9b19c"/><rect x="306" y="454" width="20" height="20" fill="#b9b19c"/></g>
+<g id="gR" tabindex="0" role="slider" aria-label="Ralo do béquer" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><line id="aR" x1="316" y1="464" stroke="${TINTA}" stroke-width="7" stroke-linecap="round"/><circle id="bR" r="14" fill="${AZUL}" stroke="${TINTA}" stroke-width="4"/></g>`;
+// conta-gotas
+m+=`<g id="gD" tabindex="0" role="button" aria-label="Conta-gotas. Segure para pingar">
+<path id="dT" d="M556 128H584V172L574 190H566L556 172Z" fill="#cdf5f6" stroke="${TINTA}" stroke-width="4" stroke-linejoin="round"/>
+<rect x="548" y="118" width="44" height="14" rx="4" fill="${SOL}" stroke="${TINTA}" stroke-width="4"/>
+<path d="M552 118V98a18 18 0 0 1 36 0V118Z" fill="${SOL}" stroke="${TINTA}" stroke-width="4"/>
+<circle id="dB" cx="570" cy="98" r="12" fill="${ROSA}" stroke="${TINTA}" stroke-width="4"/></g>`;
+// sonda e caixa de pH
+m+=`<g id="box"><polygon id="mk" points="0,26 0,50 -14,38"/><g id="bx"><rect width="100" height="76" rx="10" stroke="${TINTA}" stroke-width="4"/><text x="50" y="27" text-anchor="middle" font-size="24" style="fill:#fff">pH</text><rect x="10" y="36" width="80" height="30" rx="8" fill="${PAPEL}"/><text id="phT" x="50" y="60" text-anchor="middle" font-size="24">—</text></g></g>
+<line id="dot" stroke="${TINTA}" stroke-width="2.5" stroke-dasharray="4 4"/>
+<g id="gP" tabindex="0" role="application" aria-label="Sonda de pH. Arraste ou use as setas do teclado"><circle r="27" fill="${AZUL}" stroke="${TINTA}" stroke-width="4"/><circle r="15" fill="${PAPEL}" stroke="${TINTA}" stroke-width="3"/><path d="M-27 0H-9M9 0H27M0-27V-9M0 9V27" stroke="${TINTA}" stroke-width="3"/></g>`;
+svg.innerHTML=m;
+const E=id=>svg.querySelector('#'+id);
+const el={liq:E('liq'),liqH:E('liqH'),surf:E('surf'),lab:E('lab'),labT:E('labT'),mark:E('mark'),markT:E('markT'),sD:E('sD'),sW:E('sW'),sR:E('sR'),
+ aF:E('aF'),bF:E('bF'),aR:E('aR'),bR:E('bR'),dT:E('dT'),dB:E('dB'),box:E('box'),mk:E('mk'),bx:E('bx'),phT:E('phT'),dot:E('dot'),gP:E('gP'),cable:E('cable'),gF:E('gF'),gR:E('gR')};
+
+/* ---------- estado ---------- */
+const HF={x:758,y:104,len:62},HR={x:316,y:464,len:58};
+let sel,V,c,col,wf,dr,drip,px,py,lastSR='';
+function reset(){sel=AGUA;V=0;c=1e-7;col=rgb(AGUA[2]);wf=0;dr=0;drip=false;px=210;py=565;setSel(AGUA)}
+function setSel(l){sel=l;$('#selTxt').textContent=l[0];$('#selSw').style.background=l[2];
+  [...$('#list').children].forEach(li=>li.setAttribute('aria-selected',li.dataset.n===l[0]))}
+
+function add(dv,ph,col2){dv=Math.min(dv,CAP-V);if(dv<=0)return;const cin=Math.pow(10,-ph),n=V+dv;
+  c=(V*c+dv*cin)/n;col=col.map((v,i)=>(V*v+dv*col2[i])/n);V=n}
+
+/* ---------- física ---------- */
+function step(dt){
+  if(drip)add(.06*dt,sel[1],rgb(sel[2]));
+  if(wf>0)add(.3*wf*dt,7,rgb(AGUA[2]));
+  if(dr>0&&V>0){V=Math.max(0,V-.3*dr*dt);if(V<.0008)V=0}
+}
+
+/* ---------- desenho ---------- */
+function arm(h,v,line,ball){const a=v*.35*Math.PI,x=h.x-h.len*Math.cos(a),y=h.y-h.len*Math.sin(a);
+  line.setAttribute('x2',x);line.setAttribute('y2',y);ball.setAttribute('cx',x);ball.setAttribute('cy',y)}
+function draw(){
+  const h=V*PPL,top=BY2-h,cl=hex(col);
+  el.liq.setAttribute('y',top);el.liq.setAttribute('height',h);el.liq.setAttribute('fill',cl);
+  el.liqH.setAttribute('y',top);el.liqH.setAttribute('height',h);
+  el.surf.setAttribute('y1',top);el.surf.setAttribute('y2',top);el.surf.style.display=h>0?'':'none';
+  el.mark.setAttribute('transform',`translate(0 ${top})`);el.markT.textContent=V.toFixed(2)+' L';
+  const ph=-Math.log10(c),r=Math.round(ph*10)/10;
+  el.lab.setAttribute('visibility',V>.002?'visible':'hidden');
+  el.lab.setAttribute('transform',`translate(580 ${BY2-Math.max(h/2,20)})`);
+  el.labT.textContent=r<7?'ácido':r>7?'básico':'neutro';
+  // fluxos
+  const full=V>=CAP-.0005;
+  const dl=drip&&!full,wl=wf>0&&!full;
+  el.sD.setAttribute('height',dl?top-188:0);el.sD.setAttribute('fill',sel[2]);
+  el.sW.setAttribute('height',wl?top-178:0);
+  el.sR.setAttribute('height',dr>0&&V>0?110:0);el.sR.setAttribute('fill',cl);
+  el.dT.setAttribute('fill',sel[2]);
+  E('dB').setAttribute('transform',drip?'translate(0 3)':'');
+  arm(HF,wf,el.aF,el.bF);arm(HR,dr,el.aR,el.bR);
+  el.gF.setAttribute('aria-valuenow',Math.round(wf*100));el.gR.setAttribute('aria-valuenow',Math.round(dr*100));
+  // sonda
+  el.gP.setAttribute('transform',`translate(${px} ${py})`);
+  el.cable.setAttribute('d',`M92 490C92 ${(490+py)/2+50} ${px-100} ${py} ${px-20} ${py}`);
+  const inLiq=V>.002&&px>BX1+4&&px<BX2-4&&py>top&&py<BY2+24;
+  const yy=inLiq?Math.max(112,Math.min(448,yPH(Math.max(0,Math.min(14,ph))))):yPH(7);
+  el.box.setAttribute('transform',`translate(134 ${yy-38})`);
+  el.bx.firstElementChild.setAttribute('fill',inLiq?TINTA:'#9a96a0');
+  el.mk.setAttribute('fill',inLiq?TINTA:'#9a96a0');el.mk.style.display=inLiq?'':'none';
+  el.phT.textContent=inLiq?ph.toFixed(2):'—';
+  if(inLiq){const y=Math.max(76,Math.min(484,yPH(Math.max(0,Math.min(14,ph)))));
+    el.dot.setAttribute('x1',70);el.dot.setAttribute('x2',120);el.dot.setAttribute('y1',y);el.dot.setAttribute('y2',y);el.dot.style.display='';
+    el.box.setAttribute('transform',`translate(134 ${y-38})`);
+    const s='pH '+ph.toFixed(1)+', '+el.labT.textContent;if(s!==lastSR){lastSR=s;$('#sr').textContent=s}
+  }else el.dot.style.display='none';
+}
+
+/* ---------- ponteiro ---------- */
+let drag=null;
+function pt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
+const valFrom=(h,p)=>Math.max(0,Math.min(1,Math.atan2(-(p.y-h.y),-(p.x-h.x))/(.35*Math.PI)));
+svg.addEventListener('pointerdown',e=>{
+  const g=e.target.closest('[tabindex]');if(!g)return;audio();
+  if(g.id==='gD'){drip=true;drag='D'}
+  else if(g.id==='gF')drag='F';else if(g.id==='gR')drag='R';
+  else if(g.id==='gP'){const p=pt(e);drag={o:'P',dx:px-p.x,dy:py-p.y}}
+  if(drag)svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e);
+  if(drag==='F')wf=valFrom(HF,p);else if(drag==='R')dr=valFrom(HR,p);
+  else if(drag.o==='P'){px=Math.max(30,Math.min(970,p.x+drag.dx));py=Math.max(40,Math.min(612,p.y+drag.dy))}});
+const fim=()=>{drip=false;drag=null};
+svg.addEventListener('pointerup',fim);svg.addEventListener('pointercancel',fim);
+
+/* ---------- teclado ---------- */
+const slider=(g,get,set)=>g.addEventListener('keydown',e=>{
+  let v=get(),k=e.key;
+  if(k==='ArrowRight'||k==='ArrowUp')v+=.1;else if(k==='ArrowLeft'||k==='ArrowDown')v-=.1;else if(k==='Home')v=0;else if(k==='End')v=1;else return;
+  e.preventDefault();audio();set(Math.max(0,Math.min(1,Math.round(v*10)/10)))});
+slider(el.gF,()=>wf,v=>wf=v);slider(el.gR,()=>dr,v=>dr=v);
+E('gD').addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();audio();drip=true}});
+E('gD').addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')drip=false});
+E('gD').addEventListener('blur',()=>drip=false);
+el.gP.addEventListener('keydown',e=>{const s=e.shiftKey?48:16;let ok=true;
+  if(e.key==='ArrowLeft')px-=s;else if(e.key==='ArrowRight')px+=s;else if(e.key==='ArrowUp')py-=s;else if(e.key==='ArrowDown')py+=s;else ok=false;
+  if(ok){e.preventDefault();px=Math.max(30,Math.min(970,px));py=Math.max(40,Math.min(612,py))}});
+
+/* ---------- menu de líquidos ---------- */
+const list=$('#list'),btn=$('#selBtn');
+LIQ.forEach(l=>{const li=document.createElement('li');li.setAttribute('role','option');li.tabIndex=-1;li.dataset.n=l[0];
+  li.innerHTML=`<i class="sw" style="background:${l[2]}"></i>${l[0]}`;
+  li.onclick=()=>{setSel(l);fecha()};
+  li.onkeydown=e=>{const a=[...list.children],i=a.indexOf(li);
+    if(e.key==='ArrowDown'){e.preventDefault();a[Math.min(a.length-1,i+1)].focus()}
+    else if(e.key==='ArrowUp'){e.preventDefault();a[Math.max(0,i-1)].focus()}
+    else if(e.key==='Enter'||e.key===' '){e.preventDefault();li.click()}
+    else if(e.key==='Escape'){fecha()}};
+  list.appendChild(li)});
+function abre(){list.hidden=false;btn.setAttribute('aria-expanded','true');(list.querySelector('[aria-selected=true]')||list.firstChild).focus()}
+function fecha(){list.hidden=true;btn.setAttribute('aria-expanded','false');btn.focus()}
+btn.onclick=()=>list.hidden?abre():fecha();
+document.addEventListener('pointerdown',e=>{if(!list.hidden&&!e.target.closest('.sel')){list.hidden=true;btn.setAttribute('aria-expanded','false')}});
+
+/* ---------- som ---------- */
+let ac,gF,gD,gP,somOn=true;
+function audio(){
+  if(ac){if(ac.state==='suspended')ac.resume();return}
+  try{ac=new(window.AudioContext||window.webkitAudioContext)();
+    const b=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const s=ac.createBufferSource();s.buffer=b;s.loop=true;
+    const ramo=(f,q)=>{const fl=ac.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f;fl.Q.value=q;const g=ac.createGain();g.gain.value=0;s.connect(fl);fl.connect(g);g.connect(ac.destination);return g};
+    gF=ramo(1800,.6);gD=ramo(700,.7);gP=ramo(2600,1.3);s.start();
+  }catch(_){ac=null}
+}
+function som(){if(!ac||!gF)return;const t=ac.currentTime,full=V>=CAP-.0005;
+  gF.gain.setTargetAtTime(somOn&&!full?wf*.14:0,t,.05);
+  gD.gain.setTargetAtTime(somOn&&V>0?dr*.12:0,t,.05);
+  gP.gain.setTargetAtTime(somOn&&drip&&!full?.05:0,t,.05)}
+function setSom(v){somOn=v;$('#snd').setAttribute('aria-pressed',v);$('#sndTxt').textContent=v?'Som ligado':'Som desligado';$('#wave').style.display=v?'':'none'}
+$('#snd').onclick=()=>{audio();setSom(!somOn)};
+
+/* ---------- botões e atalhos ---------- */
+const dlg=$('#dlg');
+$('#kb').onclick=()=>dlg.showModal();$('#dclose').onclick=()=>dlg.close();
+$('#reset').onclick=reset;
+addEventListener('keydown',e=>{
+  if(dlg.open||e.ctrlKey||e.metaKey||e.altKey||e.target.closest('[role=option]'))return;
+  const k=e.key.toLowerCase();
+  if(k==='r')reset();else if(k==='m'){audio();setSom(!somOn)}else if(e.key==='?')dlg.showModal();
+});
+
+/* ---------- laço ---------- */
+reset();
+let ant=performance.now();
+(function loop(t){const dt=Math.min(.05,(t-ant)/1000);ant=t;step(dt);som();draw();requestAnimationFrame(loop)})(ant);
+})();
+</script>
+</body>
+</html>
